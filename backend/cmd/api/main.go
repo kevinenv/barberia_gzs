@@ -12,7 +12,9 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/kevinenv/barberia_gzs/backend/internal/handler"
+	"github.com/kevinenv/barberia_gzs/backend/internal/middleware"
 	"github.com/kevinenv/barberia_gzs/backend/internal/repository"
+	"github.com/kevinenv/barberia_gzs/backend/internal/service"
 )
 
 func main() {
@@ -29,32 +31,44 @@ func main() {
 
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
-		log.Fatalf(" Error conectando a MySQL: %v", err)
+		log.Fatalf("❌ Error conectando a MySQL: %v", err)
 	}
 	defer db.Close()
 
-	log.Println(" Conexión exitosa a MySQL en Docker")
+	log.Println("✅ Conexión exitosa a MySQL en Docker")
 
-	// =========================================================================
-	// INYECCIÓN DE DEPENDENCIAS (Conexión de Capas: DB -> Repo -> Handler)
-	// =========================================================================
+	// Inyección de Dependencias: Catálogo
 	catalogoRepo := repository.NewCatalogoRepository(db)
 	catalogoHandler := handler.NewCatalogoHandler(catalogoRepo)
 
-	// Inicializar Router de Gin
+	// Inyección de Dependencias: Autenticación y Usuarios
+	usuarioRepo := repository.NewUsuarioRepository(db)
+	authService := service.NewAuthService(usuarioRepo)
+	authHandler := handler.NewAuthHandler(authService, usuarioRepo)
+
 	r := gin.Default()
 
-	// Agrupación de rutas versión 1 (/api/v1)
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"status": "ok", "proyecto": "Barbería GZS"})
 		})
 
-		// Rutas públicas del catálogo
+		// Catálogo Público
 		v1.GET("/configuracion", catalogoHandler.GetConfiguracion)
 		v1.GET("/servicios", catalogoHandler.GetServicios)
 		v1.GET("/productos", catalogoHandler.GetProductos)
+
+		// Autenticación Pública
+		v1.POST("/auth/registro", authHandler.Registrar)
+		v1.POST("/auth/login", authHandler.Login)
+
+		// Rutas Protegidas (Requieren Token JWT válido)
+		protegido := v1.Group("")
+		protegido.Use(middleware.ProtegerRuta())
+		{
+			protegido.GET("/auth/perfil", authHandler.MiPerfil)
+		}
 	}
 
 	port := os.Getenv("PORT")
@@ -62,6 +76,6 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf(" Servidor corriendo en http://localhost:%s", port)
+	log.Printf("🚀 Servidor corriendo en http://localhost:%s", port)
 	r.Run(":" + port)
 }
