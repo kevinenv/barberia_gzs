@@ -1,0 +1,20 @@
+# Variables de entorno (NUNCA subir a GitHub)
+.env
+*.env
+!.env.example
+
+# Binarios y compilados de Go
+backend/bin/
+backend/main
+backend/*.exe
+backend/barberia-api
+
+# Dependencias y compilados de Vue / Node
+frontend/node_modules/
+frontend/dist/
+
+# Datos locales de Docker y editores
+mysql_data/
+.vscode/
+.idea/
+.DS_Store
