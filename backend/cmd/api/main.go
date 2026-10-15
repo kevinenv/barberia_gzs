@@ -10,44 +10,52 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
+
+	"github.com/kevinenv/barberia_gzs/backend/internal/handler"
+	"github.com/kevinenv/barberia_gzs/backend/internal/repository"
 )
 
 func main() {
-	// 1. Cargar las variables de entorno desde la raíz del proyecto (../.env)
 	if err := godotenv.Load("../.env"); err != nil {
-		log.Println("Aviso: No se encontró archivo ../.env, usando variables del sistema")
+		log.Println("Aviso: Usando variables de entorno del sistema")
 	}
 
-	// 2. Armar la cadena de conexión (DSN) para MySQL
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASSWORD")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-
-	// parseTime=true es obligatorio en Go para convertir DATETIME de MySQL a time.Time de Go
 	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:%s)/%s?parseTime=true&charset=utf8mb4",
-		dbUser, dbPass, dbPort, dbName)
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
 
-	// 3. Conectar y hacer Ping real a MySQL en Docker
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
-		log.Fatalf(" Error conectando a MySQL en Docker: %v", err)
+		log.Fatalf(" Error conectando a MySQL: %v", err)
 	}
 	defer db.Close()
 
 	log.Println(" Conexión exitosa a MySQL en Docker")
 
-	// 4. Inicializar el servidor HTTP con Gin
+	// =========================================================================
+	// INYECCIÓN DE DEPENDENCIAS (Conexión de Capas: DB -> Repo -> Handler)
+	// =========================================================================
+	catalogoRepo := repository.NewCatalogoRepository(db)
+	catalogoHandler := handler.NewCatalogoHandler(catalogoRepo)
+
+	// Inicializar Router de Gin
 	r := gin.Default()
 
-	// Endpoint de prueba de salud (Healthcheck de producción)
-	r.GET("/api/v1/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":   "ok",
-			"proyecto": "Barbería GZS",
-			"database": "MySQL conectada correctamente",
+	// Agrupación de rutas versión 1 (/api/v1)
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET("/health", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"status": "ok", "proyecto": "Barbería GZS"})
 		})
-	})
+
+		// Rutas públicas del catálogo
+		v1.GET("/configuracion", catalogoHandler.GetConfiguracion)
+		v1.GET("/servicios", catalogoHandler.GetServicios)
+		v1.GET("/productos", catalogoHandler.GetProductos)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
