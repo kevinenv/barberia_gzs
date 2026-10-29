@@ -22,9 +22,15 @@ func main() {
 		log.Println("Aviso: Usando variables de entorno del sistema")
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:%s)/%s?parseTime=true&charset=utf8mb4",
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		dbHost = "127.0.0.1"
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&charset=utf8mb4",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
+		dbHost,
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
