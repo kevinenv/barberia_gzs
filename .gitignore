@@ -2,7 +2,8 @@
 .env
 *.env
 !.env.example
-
+!frontend/.env.development
+!frontend/.env.production
 # Binarios y compilados de Go
 backend/bin/
 backend/main
