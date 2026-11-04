@@ -12,103 +12,298 @@ function cerrarSesion() {
 </script>
 
 <template>
-  <div class="app-container">
-    <header class="navbar">
-      <div class="brand" @click="router.push('/catalogo')">
-        💈 <span>Barbería GZS</span>
+  <div class="monument-shell">
+    <!-- TOP STRIP -->
+    <header class="monument-nav-strip">
+      <div class="nav-left">
+        <span class="nav-brand" @click="router.push('/catalogo')">GZS</span>
+        <span class="nav-tagline">Salón masculino en La Paz</span>
       </div>
+
       <nav class="nav-links">
-        <router-link to="/catalogo">Catálogo y Ubicación</router-link>
-        <router-link to="/reservas">Reservar Cita</router-link>
-        <router-link to="/mantenimiento">Sillas Hidráulicas</router-link>
-        <router-link to="/caja">Caja y Comisiones</router-link>
+        <router-link to="/catalogo" class="nav-link">El salón</router-link>
+        <router-link to="/reservas" class="nav-link">Turnos</router-link>
+        <router-link to="/mantenimiento" class="nav-link">Sillones</router-link>
+        <router-link to="/caja" class="nav-link">Caja</router-link>
       </nav>
-      <div class="user-panel">
+
+      <div class="nav-auth">
         <template v-if="auth.estaLogueado">
-          <span class="user-badge">👤 {{ auth.usuario?.nombre }}</span>
-          <button class="btn-outline" @click="cerrarSesion">Salir</button>
+          <span class="auth-name">{{ auth.usuario?.nombre }}</span>
+          <button class="btn-text-action" @click="cerrarSesion">Salir</button>
         </template>
-        <router-link v-else to="/login" class="btn-gold-sm">Iniciar Sesión</router-link>
+        <router-link v-else to="/login" class="btn-text-action">Acceso</router-link>
       </div>
     </header>
 
-    <main class="main-content">
+    <!-- MAIN VIEW -->
+    <main class="monument-main">
       <router-view />
     </main>
+
+    <!-- INVERTED MONUMENTAL FOOTER (direction.json: ground and ink swapped) -->
+    <footer class="monument-footer-field">
+      <div class="footer-wrap">
+        <div class="footer-top-grid">
+          <div class="footer-col">
+            <span class="footer-col-title">Dirección y salón</span>
+            <p class="footer-p">Avenida 20 de Octubre y Rosendo Gutiérrez, La Paz, Bolivia.</p>
+            <p class="footer-sub">Tres estaciones de sillón hidráulico individual con servicio personalizado.</p>
+          </div>
+
+          <div class="footer-col">
+            <span class="footer-col-title">Horario de atención</span>
+            <p class="footer-p">Lunes a sábado de 09:00 a 20:00.</p>
+            <p class="footer-sub">Atención puntual y programada sin filas de espera.</p>
+          </div>
+
+          <div class="footer-col">
+            <span class="footer-col-title">Garantía de turno</span>
+            <p class="footer-p">30% anticipo mediante QR para confirmar el sillón.</p>
+            <p class="footer-sub">Comprobante validado en línea vía WhatsApp.</p>
+          </div>
+
+          <div class="footer-col">
+            <span class="footer-col-title">Accesos directos</span>
+            <div class="footer-nav-stack">
+              <router-link to="/reservas" class="footer-nav-link">Agendar turno en línea</router-link>
+              <router-link to="/catalogo" class="footer-nav-link">Carta de cortes</router-link>
+              <router-link to="/mantenimiento" class="footer-nav-link">Taller de sillones</router-link>
+            </div>
+          </div>
+        </div>
+
+        <!-- GIANT CLOSING WORDMARK BRACKET -->
+        <div class="footer-bracket">
+          <h2 class="footer-giant-title">BARBERÍA GZS</h2>
+        </div>
+
+        <div class="footer-baseline">
+          <span>&copy; {{ new Date().getFullYear() }} Barbería GZS. Salón masculino y navaja artesanal.</span>
+          <span class="footer-credits-note">Archivos históricos: The Metropolitan Museum of Art (CC0) y Wikimedia Commons (CC BY-SA).</span>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <style>
+:root {
+  --bg-ground: #0a0a0a;
+  --bg-surface: #151515;
+  --bg-surface-elevated: #222222;
+  --text-ink: #efefef;
+  --text-muted: #a0a0a0;
+  --accent-crimson: #b11226;
+  --accent-ink: #ffffff;
+  --accent-bright: #ff6b78;
+  --field-bg: #efefef;
+  --field-ink: #0a0a0a;
+
+  --font-family: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --step-small: clamp(0.9375rem, 0.9rem + 0.1vw, 1rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --step-monument: clamp(3.2rem, 15.5vw, 16rem);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  background-color: #121316;
-  color: #f3f4f6;
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-ground);
+  color: var(--text-ink);
+  font-family: var(--font-family);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
-.app-container { max-width: 1050px; margin: 0 auto; padding: 0 1.5rem 3rem; }
-.navbar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1.2rem 0; border-bottom: 2px solid #d4af37; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
-}
-.brand { font-size: 1.5rem; font-weight: 800; color: #ffffff; cursor: pointer; }
-.brand span { color: #d4af37; }
-.nav-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
-.nav-links a { color: #d1d5db; text-decoration: none; font-weight: 500; padding: 0.4rem 0.7rem; border-radius: 6px; }
-.nav-links a.router-link-active { background: #d4af37; color: #111; font-weight: 700; }
-.user-panel { display: flex; align-items: center; gap: 0.8rem; }
-.user-badge { font-size: 0.9rem; color: #fbbf24; font-weight: 600; }
-.hero-card {
-  background: #1c1e24; border: 1px solid #d4af37; border-radius: 10px;
-  padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
-}
-.hero-card h2 { margin-top: 0; color: #fbbf24; }
-.section-title { margin-top: 2.2rem; border-left: 4px solid #d4af37; padding-left: 0.75rem; color: #fff; }
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
-.card { background: #1c1e24; border: 1px solid #2e323b; border-radius: 10px; padding: 1.2rem; }
-.card h3 { margin-top: 0; color: #fff; }
-.muted { color: #9ca3af; font-size: 0.9rem; }
-.price-tag { font-size: 1.15rem; font-weight: 700; color: #fbbf24; margin-top: 0.8rem; }
-.price-tag span { font-size: 0.85rem; color: #9ca3af; font-weight: normal; }
-.badge-sillon { display: inline-block; background: #d4af37; color: #111; font-weight: 700; font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.5rem; }
-.stock-ok { color: #34d399; font-weight: 700; margin-bottom: 0; }
-.stock-low { color: #f87171; font-weight: 700; margin-bottom: 0; }
-.btn-gold { background: #d4af37; color: #111; border: none; padding: 0.8rem 1.4rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
-.btn-gold:hover { background: #e5c158; }
-.btn-gold-sm { background: #d4af37; color: #111; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; }
-.btn-outline { background: transparent; color: #f87171; border: 1px solid #f87171; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; }
-.auth-box { max-width: 420px; margin: 2rem auto; }
-.form-vertical { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
-.form-vertical label { display: block; margin-bottom: 0.3rem; font-size: 0.9rem; color: #d1d5db; }
-.form-vertical input, .form-vertical select, .form-vertical textarea {
-  width: 100%; box-sizing: border-box; padding: 0.7rem; border-radius: 6px;
-  border: 1px solid #374151; background: #111317; color: #fff;
-}
-.alert-error { background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
-.switch-auth { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; }
-.switch-auth a { color: #fbbf24; }
 
-
-.booking-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; }
-@media (max-width: 768px) { .booking-layout { grid-template-columns: 1fr; } }
-.service-selector { display: flex; flex-direction: column; gap: 0.6rem; }
-.service-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0.8rem 1rem; border: 1px solid #374151; border-radius: 8px; cursor: pointer; background: #14161b;
+.monument-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-ground);
+  color: var(--text-ink);
 }
-.service-item.selected { border: 2px solid #d4af37; background: rgba(212, 175, 55, 0.12); }
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.summary-line { display: flex; justify-content: space-between; padding: 0.65rem 0; border-bottom: 1px solid #2e323b; }
-.highlight-gold { color: #fbbf24; font-size: 1.15rem; }
-.qr-placeholder {
-  margin: 1.2rem 0; padding: 2rem 1rem; text-align: center;
-  border: 2px dashed #d4af37; border-radius: 8px; color: #fbbf24; font-weight: bold; background: #14161b;
+
+/* TOP STRIP */
+.monument-nav-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem clamp(1.25rem, 4vw, 3rem);
+  background-color: var(--bg-ground);
 }
-.alert-success { background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #6ee7b7; padding: 0.85rem; border-radius: 6px; margin-bottom: 1rem; }
-.data-table { width: 100%; border-collapse: collapse; text-align: left; }
-.data-table th, .data-table td { padding: 0.85rem; border-bottom: 1px solid #2e323b; }
-.data-table th { color: #fbbf24; font-size: 0.9rem; }
-.maint-item { padding: 0.85rem 0; border-bottom: 1px solid #2e323b; }
 
+.nav-left {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+}
 
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--text-ink);
+  cursor: pointer;
+}
 
+.nav-tagline {
+  font-size: var(--step-body);
+  color: var(--text-muted);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.25rem;
+}
+
+.nav-link {
+  font-size: var(--step-body);
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 140ms ease;
+}
+
+.nav-link:hover,
+.nav-link.router-link-active {
+  color: var(--text-ink);
+}
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.auth-name {
+  font-size: var(--step-body);
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.btn-text-action {
+  font-size: var(--step-body);
+  font-weight: 700;
+  color: var(--accent-bright);
+  transition: opacity 140ms ease;
+}
+
+.btn-text-action:hover {
+  opacity: 0.8;
+}
+
+.monument-main {
+  flex: 1;
+}
+
+/* INVERTED FOOTER */
+.monument-footer-field {
+  background-color: var(--field-bg);
+  color: var(--field-ink);
+  padding: 6rem clamp(1.25rem, 4vw, 3rem) 2.5rem;
+  margin-top: 6rem;
+}
+
+.footer-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-top-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 3rem;
+  margin-bottom: 5rem;
+}
+
+.footer-col-title {
+  display: block;
+  font-size: var(--step-body);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--field-ink);
+}
+
+.footer-p {
+  font-size: var(--step-body);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  color: var(--field-ink);
+}
+
+.footer-sub {
+  font-size: var(--step-small);
+  color: #444444;
+  line-height: 1.45;
+}
+
+.footer-nav-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.footer-nav-link {
+  font-size: var(--step-body);
+  font-weight: 700;
+  color: var(--field-ink);
+  transition: color 140ms ease;
+}
+
+.footer-nav-link:hover {
+  color: var(--accent-crimson);
+}
+
+.footer-bracket {
+  padding: 2rem 0;
+  overflow: hidden;
+}
+
+.footer-giant-title {
+  font-size: clamp(3rem, 13vw, 14rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: var(--field-ink);
+  margin: 0;
+  word-break: break-all;
+}
+
+.footer-baseline {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 2rem;
+  font-size: var(--step-small);
+  font-weight: 600;
+  color: #555555;
+}
+
+.footer-credits-note {
+  color: #666666;
+}
+
+@media (max-width: 768px) {
+  .monument-nav-strip {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .nav-links {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .footer-baseline {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
 </style>
